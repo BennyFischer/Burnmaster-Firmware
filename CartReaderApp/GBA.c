@@ -2168,18 +2168,19 @@ void writeIntel4000_GBA(FIL * ptf)
 void writeMSP55LV128_GBA(FIL * ptf) 
 {
 
-  for (unsigned long currSector = 0; currSector < fileSize; currSector += 0x10000) 
+  for (unsigned long currSector = 0; currSector < fileSize; currSector += 0x20000) 
   {
     // Blink led
     LED_BLUE_BLINK;
     showPersent(currSector,fileSize,68,3);
     // Write to flashrom
-    for (unsigned long currSdBuffer = 0; currSdBuffer < 0x10000; currSdBuffer += 512) 
+    for (unsigned long currSdBuffer = 0; currSdBuffer < 0x20000; currSdBuffer += 512) 
     {
       // Fill SD buffer
       UINT rdt;
-      if(f_read(ptf, sdBuffer, 512, &rdt)!= FR_OK){printf("\nF_read err!");};
-
+      //if(f_read(ptf, sdBuffer, 512, &rdt)!= FR_OK){printf("\nF_read err!");};
+      f_read(ptf, sdBuffer, 512, &rdt);
+       
       // Write 16 words at a time
       for (int currWriteBuffer = 0; currWriteBuffer < 512; currWriteBuffer += 32) 
       {
@@ -2187,11 +2188,8 @@ void writeMSP55LV128_GBA(FIL * ptf)
         _reProgram:
         // Write Buffer command
         writeWord_GAB(0xAAA, 0xAA);
-        delayMicroseconds(deley_us_lv128);
         writeWord_GAB(0x555, 0x55);
-        delayMicroseconds(deley_us_lv128);
         writeWord_GAB(currSector, 0x25);
-        delayMicroseconds(deley_us_lv128);
 
         // Write word count (minus 1)
         writeWord_GAB(currSector, 0xF);
@@ -2207,37 +2205,21 @@ void writeMSP55LV128_GBA(FIL * ptf)
           writeWord_GBA(currSector + currSdBuffer + currWriteBuffer + currByte*2, currWord);
         }
 
-        //delayMicroseconds(deley_us_lv128);
         delayMicroseconds(deley_us_lv128);
         // Confirm write buffer
         writeWord_GAB(currSector, 0x29);
         delayMicroseconds(deley_us_lv128);
 
 
-
         // Read the status register
         word statusReg = readWord_GAB(currSector + currSdBuffer + currWriteBuffer + 30);
-       // int i= 0;
 
         while ((statusReg | 0xFF7F) != (currWord | 0xFF7F)) 
         {
-          //delay(1);//Microseconds(600);)
           delayMicroseconds(deley_us_lv128);          
-          statusReg = readWord_GAB(currSector + currSdBuffer + currWriteBuffer + 30);
-
-
-          //
-          //i++;
-          //if(i < 100)
-          //{
-          //  //
-          //  statusReg = readWord_GAB(currSector + currSdBuffer + currWriteBuffer + 30);
-          //  continue;
-          //}
-                   
+          statusReg = readWord_GAB(currSector + currSdBuffer + currWriteBuffer + 30);        
           if(statusReg&0x22)
           {
-            
             statusReg = readWord_GAB(currSector + currSdBuffer + currWriteBuffer + 30);
             delayMicroseconds(deley_us_lv128);
             
@@ -2246,9 +2228,7 @@ void writeMSP55LV128_GBA(FIL * ptf)
               //
               if(statusReg&0x20)
               {
-                //reset
-                //writeWord_GAB(0, 0xF0);
-                                //write buffer abort reset
+                //write buffer abort reset
                 writeWord_GAB(0xAAA, 0xAA);
                 delayMicroseconds(deley_us_lv128);
                 writeWord_GAB(0x555, 0x55);
@@ -2286,13 +2266,8 @@ void writeMSP55LV128_GBA(FIL * ptf)
             statusReg = readWord_GAB(currSector + currSdBuffer + currWriteBuffer + 30);
           }
         }
-
         delayMicroseconds(deley_us_lv128); 
-
-
       }
-
-      //delay(1);
     }
   }
   showPersent(1,1,68,3);
@@ -2300,54 +2275,100 @@ void writeMSP55LV128_GBA(FIL * ptf)
 
 
 
-
 void writeMX29GL128E_GBA(FIL * ptf) 
 {
-  for (unsigned long currSector = 0; currSector < fileSize; currSector += 0x20000) 
+   for (unsigned long currSector = 0; currSector < fileSize; currSector += 0x10000) 
   {
     // Blink led
     LED_BLUE_BLINK;
     showPersent(currSector,fileSize,68,3);
     // Write to flashrom
-    for (unsigned long currSdBuffer = 0; currSdBuffer < 0x20000; currSdBuffer += 512) 
+    for (unsigned long currSdBuffer = 0; currSdBuffer < 0x10000; currSdBuffer += 512) 
     {
       // Fill SD buffer
       UINT rdt;
       f_read(ptf, sdBuffer, 512, &rdt);
 
       // Write 32 words at a time
-      for (int currWriteBuffer = 0; currWriteBuffer < 512; currWriteBuffer += 64) {
+      for (int currWriteBuffer = 0; currWriteBuffer < 512; currWriteBuffer += 32) {
+        _reProgram:
         // Write Buffer command
         writeWord_GAB(0xAAA, 0xAA);
         writeWord_GAB(0x555, 0x55);
         writeWord_GAB(currSector, 0x25);
 
         // Write word count (minus 1)
-        writeWord_GAB(currSector, 0x1F);
+        writeWord_GAB(currSector, 0xF);
 
         // Write buffer
         word currWord;
-        for (byte cnt = 0; cnt < 32; cnt ++) {
+        for (byte currByte = 0; currByte < 16; currByte++) 
+        {
           // Join two bytes into one word
-          currWord = *(word *)(sdBuffer + currWriteBuffer + cnt*2);
-          writeWord_GBA(currSector + currSdBuffer + currWriteBuffer + cnt*2, currWord);
+          delayMicroseconds(deley_us_lv128);
+          currWord = ((word *)sdBuffer)[(currWriteBuffer>>1) + currByte];
+          writeWord_GBA(currSector + currSdBuffer + currWriteBuffer + currByte*2, currWord);
         }
 
         // Confirm write buffer
-        //delay(1);
+        delayMicroseconds(deley_us_lv128);
         writeWord_GAB(currSector, 0x29);
-        delay(1);
+        delayMicroseconds(deley_us_lv128);
 
         // Read the status register
-        word statusReg = readWord_GAB(currSector + currSdBuffer + currWriteBuffer + 62);
+        word statusReg = readWord_GAB(currSector + currSdBuffer + currWriteBuffer + 30);
 
         while ((statusReg | 0xFF7F) != (currWord | 0xFF7F)) {
-          delay_GBA();
-          statusReg = readWord_GAB(currSector + currSdBuffer + currWriteBuffer + 62);
-          
-        }
+          delayMicroseconds(deley_us_lv128);
+          if(statusReg&0x22)
+          {
+            statusReg = readWord_GAB(currSector + currSdBuffer + currWriteBuffer + 30);
+            delayMicroseconds(deley_us_lv128);
+            
+            if((statusReg | 0xFF7F) != (currWord | 0xFF7F))
+            {
+              //
+              if(statusReg&0x20)
+              {
+                //write buffer abort reset
+                writeWord_GAB(0xAAA, 0xAA);
+                delayMicroseconds(deley_us_lv128);
+                writeWord_GAB(0x555, 0x55);
+                delayMicroseconds(deley_us_lv128);
+                writeWord_GAB(0xAAA, 0xF0);
 
-        //delay(1);
+                delay(1000);
+                printf("write err1!\n");
+
+                LED_BLUE_BLINK;
+                goto _reProgram;
+              }
+              else
+              if(statusReg&0x2)
+              {
+                //write buffer abort reset
+                writeWord_GAB(0xAAA, 0xAA);
+                delayMicroseconds(deley_us_lv128);
+                writeWord_GAB(0x555, 0x55);
+                delayMicroseconds(deley_us_lv128);
+                writeWord_GAB(0xAAA, 0xF0);
+
+                delay(1000);
+                printf("write err2!\n");
+
+                LED_BLUE_BLINK;
+                goto _reProgram;
+              }
+            }
+            else break;
+          }
+          else
+          {
+            //
+            statusReg = readWord_GAB(currSector + currSdBuffer + currWriteBuffer + 30);
+          }
+        }
+        delayMicroseconds(deley_us_lv128); 
       }
     }
   }
@@ -2396,13 +2417,13 @@ void writeMX29GL128E_GBA_1(FIL * ptf)
 
 void writeSpansion_GBA(FIL * ptf) 
 {
-  for (unsigned long currSector = 0; currSector < fileSize; currSector += 0x20000) 
+  for (unsigned long currSector = 0; currSector < fileSize; currSector += 0x20000) // was 0x20000
   {
     // Blink led
     LED_BLUE_BLINK;
     showPersent(currSector,fileSize,68,3);
     // Write to flashrom
-    for (unsigned long currSdBuffer = 0; currSdBuffer < 0x20000; currSdBuffer += 512) 
+    for (unsigned long currSdBuffer = 0; currSdBuffer < 0x20000; currSdBuffer += 512) // was 0x20000
     {
       // Fill SD buffer
       UINT rdt;
