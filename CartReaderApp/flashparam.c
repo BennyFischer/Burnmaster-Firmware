@@ -19,9 +19,14 @@ uint32_t load_dword()
 
 void save_dword_at(uint32_t address, uint32_t data)
 {
+  // Erase the page first
   fmc_unlock();
+  fmc_flag_clear(FMC_FLAG_END | FMC_FLAG_WPERR | FMC_FLAG_PGERR);
+  fmc_page_erase(FMC_WRITE_START_ADDR);
+  fmc_flag_clear(FMC_FLAG_END | FMC_FLAG_WPERR | FMC_FLAG_PGERR);
+  
+  // Now write the new value
   fmc_word_program(address, data);
-  //lock the main FMC after the program operation */
   fmc_lock();
 }
 
