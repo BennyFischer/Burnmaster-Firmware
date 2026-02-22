@@ -103,7 +103,7 @@ void readROM_GBM(word numBanks)
   OledShowString(0,0,"Reading Rom...",8);   
 
   // Get name, add extension and convert to char array for sd lib
-  foldern = load_dword();
+  foldern = load_dword_at(FMC_GBM_SAVE_COUNTER_ADDR);
   //
   sprintf(fileName, "GBM%d", foldern);
   strcat(fileName, ".bin");
@@ -111,7 +111,7 @@ void readROM_GBM(word numBanks)
   f_chdir("/NP");
   // write new folder number back to eeprom
   foldern = foldern + 1;
-  save_dword(foldern);
+  save_dword_at(FMC_GBM_SAVE_COUNTER_ADDR, foldern);
 
   FIL tf;
   // Open file on sd card
@@ -515,7 +515,7 @@ void readMapping_GBM()
    
 
   // Get name, add extension and convert to char array for sd lib
-  foldern = load_dword();
+  foldern = load_dword_at(FMC_GBM_SAVE_COUNTER_ADDR);
   //
   sprintf(fileName, "GBM%d", foldern);
   strcat(fileName, ".map");
@@ -524,7 +524,7 @@ void readMapping_GBM()
 
   // write new folder number back to eeprom
   foldern = foldern + 1;
-  save_dword(foldern);
+  save_dword_at(FMC_GBM_SAVE_COUNTER_ADDR, foldern);
 
 
   FIL tf;

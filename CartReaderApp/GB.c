@@ -446,7 +446,7 @@ void readROM_GB() {
   strcat(fileName, ".GB");
 
   // create a new folder for the rom file
-  foldern = load_dword();
+  foldern = load_dword_at(FMC_GB_ROM_COUNTER_ADDR);
   f_chdir("/");
   sprintf(folder, "GB/ROM/%s/%d", romName, foldern);
 
@@ -463,7 +463,7 @@ void readROM_GB() {
 
   // write new folder number back to eeprom
   foldern = foldern + 1;
-  save_dword(foldern);
+  save_dword_at(FMC_GB_ROM_COUNTER_ADDR, foldern);
 
   //open file on sd card
   rst = f_open(&tfile,fileName, FA_CREATE_ALWAYS|FA_WRITE);
@@ -572,7 +572,7 @@ boolean compare_checksum_GB() {
   strcat(fileName, ".GB");
 
   // last used rom folder
-  foldern = load_dword();
+  foldern = load_dword_at(FMC_GB_ROM_COUNTER_ADDR);
   sprintf(folder, "GB/ROM/%s/%d", romName, foldern - 1);
 
   char calcsumStr[5];
