@@ -64,5 +64,6 @@ void ResetSystem();
 void SysClockFree();
 
 void delayMicroseconds(uint16_t us);
+int findHighestFolder(const char* basePath);
 
 #endif
