@@ -790,7 +790,7 @@ void TestSramGB(byte bankCnt , word wTestSize)
 {
 
   OledClear();
-  OledShowString(0,0,"start RAM testing...",8);
+  OledShowString(0,0,"Start RAM testing...",8);
   //
   // Set pins to input
   dataIn_GB();

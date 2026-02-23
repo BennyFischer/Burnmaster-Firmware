@@ -97,7 +97,7 @@ void aboutScreen()
   OledShowString(8,2,(char *)("Cart Flasher"),16);
   // Version contains custom integration for Spansion S29GL128N | S29GL256N | S29GL512N
   // Based on Funnyplaying 1.12 release
-  OledShowString(20,4,(char *)("Ver:1.12.C"),8);
+  OledShowString(20,4,(char *)("Ver:1.12.C.1"),8);
   OledShowString(20,5,(char *)("2025.3"),8);
   OledShowString(20,6,(char *)("Orz Studio"),8);
 
