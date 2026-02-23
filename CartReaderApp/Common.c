@@ -55,6 +55,7 @@ unsigned long writeErrors;
  * Find the highest numbered folder in the given path
  * Example: If folders 0, 1, 3 exist in "GB/SAVE/GAME/", returns 3
  * Returns -1 if no folders found, otherwise returns the highest folder number
+ * Note: Generated with AI assistance (GitHub Copilot)
  */
 int findHighestFolder(const char* basePath)
 {

@@ -13,6 +13,7 @@ extern "C"{
 #define FMC_WRITE_END_ADDR	((uint32_t)0x0803FFFFU)
 
 // Separate addresses for different cartridge types
+// Note: Generated with AI assistance (GitHub Copilot)
 #define FMC_GB_SAVE_COUNTER_ADDR   ((uint32_t)0x0803FC00U)  // Game Boy save counter
 #define FMC_GB_ROM_COUNTER_ADDR    ((uint32_t)0x0803FC04U)  // Game Boy ROM counter
 #define FMC_GBA_ROM_COUNTER_ADDR   ((uint32_t)0x0803FC08U)  // Game Boy Advance ROM counter
