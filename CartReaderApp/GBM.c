@@ -102,16 +102,16 @@ void readROM_GBM(word numBanks)
 {
   OledShowString(0,0,"Reading Rom...",8);   
 
-  // Get name, add extension and convert to char array for sd lib
-  foldern = load_dword_at(FMC_GBM_SAVE_COUNTER_ADDR);
-  //
+  // Find the highest existing folder number and use next one
+  char basePath[32];
+  sprintf(basePath, "/NP");
+  int highestFolder = findHighestFolder(basePath);
+  foldern = highestFolder + 1;  // Use next folder number
+  
   sprintf(fileName, "GBM%d", foldern);
   strcat(fileName, ".bin");
   my_mkdir("/NP");
   f_chdir("/NP");
-  // write new folder number back to eeprom
-  foldern = foldern + 1;
-  save_dword_at(FMC_GBM_SAVE_COUNTER_ADDR, foldern);
 
   FIL tf;
   // Open file on sd card
@@ -515,16 +515,15 @@ void readMapping_GBM()
    
 
   // Get name, add extension and convert to char array for sd lib
-  foldern = load_dword_at(FMC_GBM_SAVE_COUNTER_ADDR);
-  //
+  char basePath[32];
+  sprintf(basePath, "/NP");
+  int highestFolder = findHighestFolder(basePath);
+  foldern = highestFolder + 1;  // Use next folder number
+  
   sprintf(fileName, "GBM%d", foldern);
   strcat(fileName, ".map");
   my_mkdir("/NP");
   f_chdir("NP");
-
-  // write new folder number back to eeprom
-  foldern = foldern + 1;
-  save_dword_at(FMC_GBM_SAVE_COUNTER_ADDR, foldern);
 
 
   FIL tf;
