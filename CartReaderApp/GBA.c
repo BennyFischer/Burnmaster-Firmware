@@ -524,7 +524,7 @@ void readROM_GBA()
   strcat(fileName, ".gba");
 
   // create a new folder for the rom file
-  foldern = load_dword();
+  foldern = load_dword_at(FMC_GBA_ROM_COUNTER_ADDR);
   sprintf(folder, "/GBA/ROM/%s/%d", romName, foldern);
   my_mkdir(folder);
   f_chdir(folder);
@@ -533,10 +533,6 @@ void readROM_GBA()
   OledClear();
   OledShowString(0,0,"Saving to :",8);
   OledShowString(0,1,folder,8);
-
-  // write new folder number back to eeprom
-  foldern = foldern + 1;
-  save_dword(foldern);
 
   FIL tf;
   //open file on sd card
@@ -579,8 +575,10 @@ boolean compare_checksum_GBA ()
   strcat(fileName, ".gba");
 
   // last used rom folder
-  foldern = load_dword();
-  sprintf(folder, "/GBA/ROM/%s/%d", romName, foldern - 1);
+  char basePath[64];
+  sprintf(basePath, "/GBA/ROM/%s", romName);
+  int highestFolder = findHighestFolder(basePath);
+  sprintf(folder, "/GBA/ROM/%s/%d", romName, highestFolder);
   f_chdir(folder);
 
 
@@ -639,7 +637,11 @@ void readSRAM_GBA(boolean browseFile, unsigned long sramSize, uint32_t pos)
     strcat(fileName, ".srm");
 
     // create a new folder for the save file
-    foldern = load_dword();
+    char basePath[64];
+    sprintf(basePath, "GBA/SAVE/%s", romName);
+    int highestFolder = findHighestFolder(basePath);
+    foldern = highestFolder + 1;  // Use next folder number
+    
     sprintf(folder, "GBA/SAVE/%s/%d", romName, foldern);
     my_mkdir(folder);
     f_chdir(folder);
@@ -647,9 +649,6 @@ void readSRAM_GBA(boolean browseFile, unsigned long sramSize, uint32_t pos)
     // Save location
     OledShowString(0,0,"Saving to :",8);
     OledShowString(0,1,folder,8);
-    // write new folder number back to eeprom
-    foldern = foldern + 1;
-    save_dword(foldern);
   }
 
   //open file on sd card
@@ -1114,7 +1113,10 @@ void readEeprom_GBA(word eepSize) {
   strcat(fileName, ".eep");
 
   // create a new folder for the save file
-  foldern = load_dword();
+  char basePath[64];
+  sprintf(basePath, "GBA/SAVE/%s", romName);
+  int highestFolder = findHighestFolder(basePath);
+  foldern = highestFolder + 1;  // Use next folder number
 
   sprintf(folder, "GBA/SAVE/%s/%d", romName, foldern);
   my_mkdir(folder);
@@ -1123,11 +1125,6 @@ void readEeprom_GBA(word eepSize) {
   // Save location
   OledShowString(0,0,"Saving to :",8);
   OledShowString(0,1,folder,8);
-  
-
-  // write new folder number back to eeprom
-  foldern = foldern + 1;
-  save_dword(foldern);
 
   FIL tf;
 
@@ -1415,7 +1412,10 @@ void readFLASH_GBA (boolean browseFile, unsigned long flashSize, uint32_t pos)
     strcat(fileName, ".fla");
 
     // create a new folder for the save file
-    foldern = load_dword();
+    char basePath[64];
+    sprintf(basePath, "GBA/SAVE/%s", romName);
+    int highestFolder = findHighestFolder(basePath);
+    foldern = highestFolder + 1;  // Use next folder number
 
     sprintf(folder, "GBA/SAVE/%s/%d", romName, foldern);
     my_mkdir(folder);
@@ -1424,10 +1424,6 @@ void readFLASH_GBA (boolean browseFile, unsigned long flashSize, uint32_t pos)
     // Save location
     OledShowString(0,0,"Saving to :",8);
     OledShowString(0,1,folder,8);
-
-    // write new folder number back to eeprom
-    foldern = foldern + 1;
-    save_dword(foldern);
   }
 
 

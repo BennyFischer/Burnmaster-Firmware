@@ -445,8 +445,12 @@ void readROM_GB() {
   strcpy(fileName, romName);
   strcat(fileName, ".GB");
 
-  // create a new folder for the rom file
-  foldern = load_dword();
+  // Find the highest existing folder number and use next one
+  char basePath[64];
+  sprintf(basePath, "GB/ROM/%s", romName);
+  int highestFolder = findHighestFolder(basePath);
+  foldern = highestFolder + 1;  // Use next folder number
+  
   f_chdir("/");
   sprintf(folder, "GB/ROM/%s/%d", romName, foldern);
 
@@ -460,10 +464,6 @@ void readROM_GB() {
   OledShowString(0,0,"Saving to ",8);
   OledShowString(4,1,folder,8);
   //printf("/..."));
-
-  // write new folder number back to eeprom
-  foldern = foldern + 1;
-  save_dword(foldern);
 
   //open file on sd card
   rst = f_open(&tfile,fileName, FA_CREATE_ALWAYS|FA_WRITE);
@@ -571,9 +571,11 @@ boolean compare_checksum_GB() {
   strcpy(fileName, romName);
   strcat(fileName, ".GB");
 
-  // last used rom folder
-  foldern = load_dword();
-  sprintf(folder, "GB/ROM/%s/%d", romName, foldern - 1);
+  // Find the highest existing folder number
+  char basePath[64];
+  sprintf(basePath, "GB/ROM/%s", romName);
+  int highestFolder = findHighestFolder(basePath);
+  sprintf(folder, "GB/ROM/%s/%d", romName, highestFolder);
 
   char calcsumStr[5];
   sprintf(calcsumStr, "%04X", calc_checksum_GB(fileName, folder));
@@ -605,15 +607,15 @@ void readSRAM_GB() {
     strcpy(fileName, romName);
     strcat(fileName, ".sav");
 
-    // create a new folder for the save file
-    foldern = load_dword();
+    // Find the highest existing folder number and use next one
+    char basePath[64];
+    sprintf(basePath, "GB/SAVE/%s", romName);
+    int highestFolder = findHighestFolder(basePath);
+    foldern = highestFolder + 1;  // Use next folder number
+    
     sprintf(folder, "GB/SAVE/%s/%d", romName, foldern);
     my_mkdir(folder);
     f_chdir(folder);
-
-    // write new folder number back to eeprom
-    foldern = foldern + 1;
-    save_dword(foldern);
 
     //open file on sd card
     FIL tfile;
